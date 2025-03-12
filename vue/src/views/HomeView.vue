@@ -2,7 +2,7 @@
   <div style="padding:10px">
 <!--    功能区域-->
     <div style="margin:10px 0">
-      <el-button type="primary">新增</el-button>
+      <el-button type="primary" @click = "add">新增</el-button>
       <el-button type="primary">导入</el-button>
       <el-button type="primary">导出</el-button>
     </div>
@@ -16,12 +16,15 @@
                border
                stripe
                style="width: 100%">
-      <el-table-column prop="date" label="Date"
+      <el-table-column prop="id" label="ID"
       sortable/>
-      <el-table-column prop="name" label="Name" />
-      <el-table-column prop="address" label="Address" />
+      <el-table-column prop="username" label="用户名" />
+      <el-table-column prop="nickName" label="昵称" />
+      <el-table-column prop="age" label="年龄" />
+      <el-table-column prop="sex" label="性别" />
+      <el-table-column prop="address" label="地址" />
       <el-table-column fixed="right" label="Operations" min-width="120">
-        <template #default>
+        <template #default="{ row }">
           <el-button link type="primary"  @click="handleEdit(scope.row)">
             编辑
           </el-button>
@@ -46,12 +49,52 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
       />
+      <el-dialog
+          v-model="dialogVisible"
+          title="Tips"
+          width="500"
+          :before-close="handleClose"
+      >
+        <el-form :model="form" label-width="120px">
+          <el-form-item label="用户名">
+            <el-input v-model="form.username" style="width: 80%" />
+          </el-form-item>
+          <el-form-item label="昵称">
+            <el-input v-model="form.nickName" style="width: 80%" />
+          </el-form-item>
+          <el-form-item label="年龄">
+            <el-input v-model="form.age" style="width: 80%" />
+          </el-form-item>
+          <el-form-item label="性别">
+            <el-radio v-model="form.sex" label="男">男</el-radio>
+            <el-radio v-model="form.sex" label="女">女</el-radio>
+            <el-radio v-model="form.sex" label="未知">未知</el-radio>
+          </el-form-item>
+          <el-form-item label="地址">
+            <el-input type="textarea" v-model="form.address" style="width: 80%" />
+          </el-form-item>
+        </el-form>
+
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="dialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="save">
+              确定
+            </el-button>
+          </div>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
+
+// 表单数据
+const form = ref({
+  username: ""
+});
 
 // 搜索框
 const search = ref("");
@@ -62,13 +105,21 @@ const pageSize = ref(2);
 
 // 原始数据
 const tableData = ref([
-  { date: "2023-03-01", name: "Alice", address: "北京" },
-  { date: "2023-03-02", name: "Bob", address: "上海" },
-  { date: "2023-03-03", name: "Charlie", address: "广州" },
-  { date: "2023-03-04", name: "David", address: "深圳" },
-  { date: "2023-03-05", name: "Eve", address: "杭州" },
-  { date: "2023-03-06", name: "Frank", address: "南京" },
+
 ]);
+
+// 打开弹窗
+const add = () => {
+  dialogVisible.value = true;
+  form.value = { username: "" };
+};
+
+const save = () => {
+  
+};
+
+// 弹窗可见性
+const dialogVisible = ref(false);
 
 // 计算符合搜索条件的数据
 const filteredData = computed(() => {
@@ -98,4 +149,16 @@ const handleSizeChange = (newSize) => {
 const handleCurrentChange = (newPage) => {
   currentPage.value = newPage;
 };
+
+// 编辑操作
+const handleEdit = (row) => {
+  form.value.username = row.username;
+  dialogVisible.value = true;
+};
+
+// 删除操作
+const handleDelete = (row) => {
+  tableData.value = tableData.value.filter(item => item.id !== row.id);
+};
+
 </script>
